@@ -54,7 +54,7 @@ pub fn search(haystack: &str, needle: &str) -> Option<usize> {
     let needle_hash = HashFrame::from(needle);
     let mut hay_hash = HashFrame::from(&haystack[0..needle.len()]);
 
-    for i in 0..(haystack.len() - needle.len()) {
+    for i in 0..(haystack.len() - needle.len() + 1) {
         if needle_hash == hay_hash {
             let hay = haystack[i..(i + needle.len())].chars();
             let mut equal = true;
@@ -68,8 +68,10 @@ pub fn search(haystack: &str, needle: &str) -> Option<usize> {
             if equal { return Some(i); }
         }
 
-        let pattern = &haystack[(i + 1)..(i + needle.len() + 1)];
-        hay_hash = hay_hash.next(pattern);
+        if i < haystack.len() - needle.len() {
+            let pattern = &haystack[(i + 1)..(i + needle.len() + 1)];
+            hay_hash = hay_hash.next(pattern);
+        }
     }
 
     None
