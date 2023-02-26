@@ -1,6 +1,9 @@
 #![allow(unused)]
 
-#[derive(Debug)]
+use std::collections::HashSet;
+use std::hash::{Hash, Hasher};
+
+#[derive(Debug, Eq)]
 struct HashFrame<'a> {
     hash: u64,
     pattern: &'a str,
@@ -50,26 +53,39 @@ impl PartialEq for HashFrame<'_> {
     }
 }
 
-pub fn search(haystack: &str, needle: &str) -> Option<usize> {
-    let needle_hash = HashFrame::from(needle);
-    let mut hay_hash = HashFrame::from(&haystack[0..needle.len()]);
+impl Hash for HashFrame<'_> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        state.write(&self.hash.to_ne_bytes());
+    }
+}
 
-    for i in 0..(haystack.len() - needle.len() + 1) {
-        if needle_hash == hay_hash {
-            let hay = haystack[i..(i + needle.len())].chars();
-            let mut equal = true;
-            for (a, b) in hay.zip(needle.chars()) {
-                if a != b {
-                    equal = false;
-                    break;
-                }
+pub fn search(haystack: &str, needles: HashSet<&str>) -> Option<usize> {
+    if needles.is_empty() { return None; };
+
+    let needle_len = needles.iter().next().unwrap().len();
+    let mut hay_hash = HashFrame::from(&haystack[0..needle_len]);
+    let needle_hashes = needles.iter()
+        .map(|needle| HashFrame::from(*needle))
+        .collect::<HashSet<HashFrame>>();
+
+    for i in 0..(haystack.len() - needle_len + 1) {
+        if needle_hashes.contains(&hay_hash) {
+            for needle in needles.iter() {
+                let hay = haystack[i..(i + needle_len)].chars();
+                let mut equal = true;
+                for (a, b) in hay.zip(needle.chars()) {
+                    if a != b {
+                        equal = false;
+                        break;
+                    }
+                };
+
+                if equal { return Some(i); }
             }
-
-            if equal { return Some(i); }
         }
 
-        if i < haystack.len() - needle.len() {
-            let pattern = &haystack[(i + 1)..(i + needle.len() + 1)];
+        if i < haystack.len() - needle_len {
+            let pattern = &haystack[(i + 1)..(i + needle_len + 1)];
             hay_hash = hay_hash.next(pattern);
         }
     }
@@ -84,9 +100,15 @@ mod tests {
     #[test]
     fn test_search() {
         let haystack = "abccddaefg";
-        let needle = "cdd";
-        let id = search(haystack, needle);
+        let id = search(haystack, ["cdd"].into());
         assert_eq!(3, id.unwrap());
+    }
+
+    #[test]
+    fn test_search_multiple_patterns() {
+        let haystack = "abccddaefg";
+        let id = search(haystack, ["cdd", "bcc"].into());
+        assert_eq!(1, id.unwrap());
     }
 
     #[test]
