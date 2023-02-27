@@ -35,8 +35,6 @@ impl<'a> HashFrame<'a> {
 
 impl<'a> From<&'a str> for HashFrame<'a> {
     fn from(pattern: &'a str) -> HashFrame<'a> {
-        if pattern.is_empty() { return HashFrame::new(0, pattern); }
-
         let prime = HashFrame::DEFAULT_PRIME;
         let base = HashFrame::ALPHABET_SIZE;
 
@@ -69,19 +67,18 @@ pub fn search(haystack: &str, needles: HashSet<&str>) -> Option<usize> {
         .collect::<HashSet<HashFrame>>();
 
     for i in 0..(haystack.len() - needle_len + 1) {
-        if needle_hashes.contains(&hay_hash) {
-            for needle in needles.iter() {
-                let hay = haystack[i..(i + needle_len)].chars();
-                let mut equal = true;
-                for (a, b) in hay.zip(needle.chars()) {
-                    if a != b {
-                        equal = false;
-                        break;
-                    }
-                };
+        if let Some(needle) = needle_hashes.get(&hay_hash) {
+            let needle = needle.pattern;
+            let hay = haystack[i..(i + needle_len)].chars();
+            let mut equal = true;
+            for (a, b) in hay.zip(needle.chars()) {
+                if a != b {
+                    equal = false;
+                    break;
+                }
+            };
 
-                if equal { return Some(i); }
-            }
+            if equal { return Some(i); }
         }
 
         if i < haystack.len() - needle_len {
