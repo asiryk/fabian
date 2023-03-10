@@ -70,19 +70,15 @@ impl Hash for HashFrame<'_> {
     }
 }
 
-pub fn search(haystack: &str, needles: HashSet<&str>) -> Option<usize> {
-    if needles.is_empty() { return None; };
-    let haystack = haystack.as_bytes();
+pub fn search(haystack: &[u8], needle: &[u8]) -> Option<usize> {
+    if needle.is_empty() { return None; };
 
-    let needle_len = needles.iter().next().unwrap().len();
-    let mut hay_hash = HashFrame::from(&haystack[0..needle_len]);
-    let needle_hashes = needles.iter()
-        .map(|needle| HashFrame::from(*needle))
-        .collect::<HashSet<HashFrame>>();
+    let needle_len = needle.len();
+    let needle_hash = HashFrame::from(needle);
+    let mut hay_hash = HashFrame::from(&haystack[0..needle.len()]);
 
     for i in 0..(haystack.len() - needle_len + 1) {
-        if let Some(needle) = needle_hashes.get(&hay_hash) {
-            let needle = needle.pattern;
+        if needle_hash == hay_hash {
             let hay = &haystack[i..(i + needle_len)];
             let mut equal = true;
             for (a, b) in hay.iter().zip(needle) {
@@ -110,15 +106,15 @@ mod tests {
 
     #[test]
     fn test_search() {
-        let haystack = "abccddaefg";
-        let id = search(haystack, ["cdd"].into());
+        let haystack = "abccddaefg".as_bytes();
+        let id = search(haystack, "cdd".as_bytes());
         assert_eq!(3, id.unwrap());
     }
 
     #[test]
     fn test_search_multiple_patterns() {
-        let haystack = "abccddaefg";
-        let id = search(haystack, ["cdd", "bcc"].into());
+        let haystack = "abccddaefg".as_bytes();
+        let id = search(haystack, "bcc".as_bytes());
         assert_eq!(1, id.unwrap());
     }
 
