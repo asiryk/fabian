@@ -1,10 +1,12 @@
 #![allow(unused)]
 
 pub fn search(haystack: &str, needle: &str) -> Option<usize> {
+    let haystack = haystack.as_bytes();
+    let needle = needle.as_bytes();
     for i in 0..(haystack.len() - needle.len() + 1) {
-        let hay = haystack[i..(i + needle.len())].chars();
+        let hay = haystack[i..(i + needle.len())].iter();
         let mut equal = true;
-        for (a, b) in hay.zip(needle.chars()) {
+        for (a, b) in hay.zip(needle) {
             if a != b {
                 equal = false;
                 break;
