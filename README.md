@@ -8,6 +8,10 @@
 * [fast fourier wiki](https://en.wikipedia.org/wiki/Fast_Fourier_transform)
 * [fast fourier bachelor text](https://ela.kpi.ua/handle/123456789/36719)
 * [esmaj rabin karp](https://www-igm.univ-mlv.fr/~lecroq/string/node5.html)
+* [compact_str](https://github.com/ParkMyCar/compact_str)
+* [burnt-sushi ripgrep](https://github.com/BurntSushi/ripgrep)
+* [burnt-sushi aho-corasick](https://github.com/BurntSushi/aho-corasick)
+* [burnt-sushi suffix](https://github.com/BurntSushi/suffix)
 
 ### Ideas
 
