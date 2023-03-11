@@ -62,6 +62,8 @@ impl Hash for HashFrame<'_> {
 pub fn search(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     if needle.is_empty() { return None; };
 
+    let mut hash_collisions = 0;
+
     let needle_len = needle.len();
     let needle_hash = HashFrame::new(needle);
     let mut hay_hash = HashFrame::new(&haystack[0..needle.len()]);
@@ -73,11 +75,15 @@ pub fn search(haystack: &[u8], needle: &[u8]) -> Option<usize> {
             for (a, b) in hay.iter().zip(needle) {
                 if a != b {
                     equal = false;
+                    hash_collisions += 1;
                     break;
                 }
             };
 
-            if equal { return Some(i); }
+            if equal {
+                log::trace!("total hash collisions = {}", hash_collisions);
+                return Some(i);
+            }
         }
 
         if i < haystack.len() - needle_len {
@@ -85,6 +91,8 @@ pub fn search(haystack: &[u8], needle: &[u8]) -> Option<usize> {
             hay_hash = hay_hash.next(pattern);
         }
     }
+
+    log::trace!("total hash collisions = {}", hash_collisions);
 
     None
 }

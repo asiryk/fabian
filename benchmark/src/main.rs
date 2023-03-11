@@ -7,14 +7,16 @@ use memchr::memmem;
 pub const WORDS_15000_RAW: &'static str = include_str!("../data/words-15000");
 
 fn main() {
+    env_logger::builder().filter_level(log::LevelFilter::Trace).init();
+
     // haystack = 63
     // let ind = rabin_karp_63_haystack_memchr();
     // let ind = rabin_karp_63_haystack();
     // let ind = naive_63_haystack();
 
     // haystack = full
-    let ind = naive_huge_haystack_large_needle();
-    // let ind = rabin_karp_huge_haystack_large_needle();
+    // let ind = naive_huge_haystack_large_needle();
+    let ind = rabin_karp_huge_haystack_large_needle();
     // let ind = memchr_huge_haystack_large_needle();
 
     if let Some(ind) = ind {
