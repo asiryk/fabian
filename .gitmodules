@@ -1,0 +1,3 @@
+[submodule "memchr"]
+	path = memchr
+	url = https://github.com/BurntSushi/memchr.git

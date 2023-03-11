@@ -3,4 +3,5 @@
 members = [
     "search",
     "benchmark",
+    "memchr",
 ]

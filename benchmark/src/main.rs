@@ -15,9 +15,10 @@ fn main() {
     // let ind = naive_63_haystack();
 
     // haystack = full
-    // let ind = naive_huge_haystack_large_needle();
-    let ind = rabin_karp_huge_haystack_large_needle();
+    let ind = naive_huge_haystack_large_needle();
+    // let ind = rabin_karp_huge_haystack_large_needle();
     // let ind = memchr_huge_haystack_large_needle();
+    // let ind = memchr_rabinkarp_haystack_large_needle();
 
     if let Some(ind) = ind {
         println!("found pattern at {} byte", ind);
@@ -34,6 +35,16 @@ fn memchr_huge_haystack_large_needle() -> Option<usize> {
     let needle = "unprepossessing narcissist amazingly microelectronics sassafrases barnacled shepherding capitalists horsetail unintentional grandchildren predestines undifferentiated possesses attenuate passivization reconcilable carpetbag shortsightedly combative photoengrave flowerpots fallibility graveyard denominated checkrooms hollowest extemporize mathematics abundantly limescale supporting fascicles translucency diplomatic carthorse gridlocked emasculating unassailable thingamabob counterclaimed contribution overzealous fatherlands bracketed animosity virtualization enriching repudiated redactors commandeered consideration mortuaries chamberlains cuckolded perturbing flabbiness crankshaft analogizes desensitizing lasciviousness placeholder shareholder architraves redelivering monopolizes mythology cutthroats philanthropically premiered imprecisely unsealing alphabetizations crossbowman rectifier exquisitely overwhelms whatshisname contradistinction inadequacies helicoptered tealights capability understudies grumpiest jeeringly Zarathustra jellyfishes steaminess Menkalinan netiquettes purposelessly impounding pinpoints southwards dysphagia wholesalers existence microwaving dishonors ineligibles lavaliere unaesthetic inflexibly acknowledging unforgivable barracuda constrictive marveling insularity preconceptions fiddlesticks redounded strikebreaker theologically abidingly falsifying collocate predominately transposition Turkmenistan schnitzels Chittagong corroding colloquially underacted motorcycle mouthpiece haystacks margaritas antipodals givebacks phenomenon ultrasound salesperson stomachache bombarding sandpapering".as_bytes();
 
     memmem::find(haystack, needle)
+}
+
+/// Benchmark 1: fabian-bench
+///   Time (mean ± σ):       1.1 ms ±   0.3 ms    [User: 0.6 ms, System: 0.3 ms]
+///   Range (min … max):     0.7 ms …   3.3 ms    817 runs
+fn memchr_rabinkarp_haystack_large_needle() -> Option<usize> {
+    let haystack = WORDS_15000_RAW.as_bytes();
+    let needle = "unprepossessing narcissist amazingly microelectronics sassafrases barnacled shepherding capitalists horsetail unintentional grandchildren predestines undifferentiated possesses attenuate passivization reconcilable carpetbag shortsightedly combative photoengrave flowerpots fallibility graveyard denominated checkrooms hollowest extemporize mathematics abundantly limescale supporting fascicles translucency diplomatic carthorse gridlocked emasculating unassailable thingamabob counterclaimed contribution overzealous fatherlands bracketed animosity virtualization enriching repudiated redactors commandeered consideration mortuaries chamberlains cuckolded perturbing flabbiness crankshaft analogizes desensitizing lasciviousness placeholder shareholder architraves redelivering monopolizes mythology cutthroats philanthropically premiered imprecisely unsealing alphabetizations crossbowman rectifier exquisitely overwhelms whatshisname contradistinction inadequacies helicoptered tealights capability understudies grumpiest jeeringly Zarathustra jellyfishes steaminess Menkalinan netiquettes purposelessly impounding pinpoints southwards dysphagia wholesalers existence microwaving dishonors ineligibles lavaliere unaesthetic inflexibly acknowledging unforgivable barracuda constrictive marveling insularity preconceptions fiddlesticks redounded strikebreaker theologically abidingly falsifying collocate predominately transposition Turkmenistan schnitzels Chittagong corroding colloquially underacted motorcycle mouthpiece haystacks margaritas antipodals givebacks phenomenon ultrasound salesperson stomachache bombarding sandpapering".as_bytes();
+
+    memmem::rabin_karp_find(haystack, needle)
 }
 
 /// Benchmark 1: fabian-bench -w 2 \
