@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 pub fn search(haystack: &[u8], needle: &[u8]) -> Option<usize> {
     for i in 0..(haystack.len() - needle.len() + 1) {
         let hay = haystack[i..(i + needle.len())].iter();

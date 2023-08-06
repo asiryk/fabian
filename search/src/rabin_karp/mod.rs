@@ -1,59 +1,63 @@
-#![allow(unused)]
-
-use std::collections::HashSet;
 use std::hash::{Hash, Hasher};
 
 #[derive(Debug, Eq)]
-struct HashFrame<'a> {
+struct HashFrame {
     hash: u64,
-    pattern: &'a [u8],
+    first_byte: u8,
+    pattern_len: usize,
 }
 
-impl<'a> HashFrame<'a> {
+impl HashFrame {
     const DEFAULT_PRIME: u64 = 101;
     const ALPHABET_SIZE: u64 = 256;
 
-    pub fn new(pattern: &'a [u8]) -> HashFrame<'a> {
+    pub fn new(pattern: &[u8]) -> Self {
         let prime = HashFrame::DEFAULT_PRIME;
         let base = HashFrame::ALPHABET_SIZE;
 
         let hash = pattern.iter()
             .fold(0, |hash, c| (hash * base + *c as u64) % prime);
 
-        HashFrame { hash, pattern }
+        let first_byte = pattern[0];
+        let pattern_len = pattern.len();
+
+        HashFrame { hash, first_byte, pattern_len }
     }
 
-    pub fn next<'b>(&self, pattern: &'b [u8]) -> HashFrame<'b> {
+    pub fn next(&self, pattern: &[u8]) -> Self {
         let base = HashFrame::ALPHABET_SIZE;
         let prime = HashFrame::DEFAULT_PRIME;
 
         let mut hash = self.hash;
-        let multiplier = (1..self.pattern.len()).fold(1, |mul, _| (mul * base) % prime);
+        let multiplier = (1..self.pattern_len).fold(1, |mul, _| (mul * base) % prime);
         hash += prime; // Ensure non-negative hash by adding the modulus
-        hash -= (multiplier * self.pattern[0] as u64) % prime;
+        hash -= (multiplier * self.first_byte as u64) % prime;
         hash *= base;
         hash += pattern[pattern.len() - 1] as u64;
         hash %= prime;
 
-        HashFrame { hash, pattern }
+        let first_byte = pattern[0];
+        let pattern_len = pattern.len();
+
+        HashFrame { hash, first_byte, pattern_len }
     }
 }
 
-impl<'a> From<&'a str> for HashFrame<'a> {
-    fn from(pattern: &'a str) -> HashFrame<'a> {
+impl From<&str> for HashFrame {
+    fn from(pattern: &str) -> HashFrame {
         let pattern = pattern.as_bytes();
 
         HashFrame::new(pattern)
     }
 }
 
-impl PartialEq for HashFrame<'_> {
+impl PartialEq for HashFrame {
     fn eq(&self, other: &Self) -> bool {
         self.hash == other.hash
     }
 }
 
-impl Hash for HashFrame<'_> {
+impl Hash for HashFrame {
     fn hash<H: Hasher>(&self, state: &mut H) {
         state.write(&self.hash.to_ne_bytes());
     }
@@ -96,6 +100,8 @@ pub fn search(haystack: &[u8], needle: &[u8]) -> Option<usize> {
 
     None
 }
+
+pub mod rabin_fingerprint_hash {}
 
 #[cfg(test)]
 mod tests {
